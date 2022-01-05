@@ -33,10 +33,24 @@ let responseObject = {};
 app.get("/api/:input", (req, res) => {
   let input = req.params.input;
 
-  if (input.includes("-")) {
-    /* Date String */
+  if (/^\d*$/.test(input)) {
+    input = parseInt(input);
+    responseObject["unix"] = new Date(input).getTime();
+    responseObject["utc"] = new Date(input).toUTCString();
+  } else {
     responseObject["unix"] = new Date(input).getTime();
     responseObject["utc"] = new Date(input).toUTCString();
   }
+
+  if (!responseObject["unix"] || !responseObject["utc"]) {
+    res.json({ error: "Invalid Date" });
+  }
+  res.json(responseObject);
+});
+
+app.get("/api/", (req, res) => {
+  responseObject["unix"] = new Date().getTime();
+  responseObject["utc"] = new Date().toUTCString();
+
   res.json(responseObject);
 });
